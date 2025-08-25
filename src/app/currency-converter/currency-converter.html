@@ -1,0 +1,37 @@
+<div *ngIf="!isLoading" class="converter-body">
+  <div class="form-group">
+    <label for="amountFrom">Valor</label>
+    <input
+      type="number"
+      id="amountFrom"
+      class="form-control"
+      [(ngModel)]="amountFrom"
+      min="0"
+    />
+  </div>
+
+  <div class="currency-selectors">
+    </div>
+
+  <div class="form-group">
+    <label for="amountTo">Valor Convertido</label>
+    <input
+      type="number"
+      id="amountTo"
+      class="form-control"
+      [(ngModel)]="amountTo"
+      min="0"
+    />
+  </div>
+
+  <div class="result-info">
+    <p class="exchange-rate">{{ exchangeRate }}</p>
+    <p class="last-update" *ngIf="lastUpdate">
+      Última atualização: {{ lastUpdate | date:'dd/MM/yyyy HH:mm:ss' }} UTC
+    </p>
+  </div>
+
+  <button class="convert-button" (click)="convert()">Converter</button>
+  
+  <button class="clear-button" (click)="clearValues()">Limpar</button>
+</div>

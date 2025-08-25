@@ -1,0 +1,227 @@
+/* src/app/currency-converter/currency-converter.component.css */
+
+/* Define variáveis de cor para fácil manutenção */
+:host {
+  --primary-color: #6d5edc;
+  --secondary-color: #3498db;
+  --background-color: #ffffff;
+  --card-background: rgba(255, 255, 255, 0.95);
+  --text-color: #34495e;
+  --light-text-color: #7f8c8d;
+  --border-color: #e0e5ec;
+  --shadow-light: rgba(255, 255, 255, 0.5);
+  --shadow-dark: rgba(217, 210, 209, 0.4);
+  --danger-color: #e74c3c;
+}
+
+.converter-container {
+  background: var(--card-background);
+  padding: 2.5rem 3rem;
+  border-radius: 20px;
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    inset 0 0 2px 1px rgba(255, 255, 255, 0.6);
+  width: 100%;
+  max-width: 500px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.converter-container:hover {
+  transform: translateY(-5px);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.header h1 {
+  color: var(--text-color);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.header p {
+  color: var(--light-text-color);
+  font-size: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.form-control {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8f9fa;
+  color: var(--text-color);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(109, 94, 220, 0.15);
+}
+
+/* Remove as setas de incremento/decremento do input number */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.currency-selectors {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.swap-button {
+  background: linear-gradient(145deg, #f0f2f5, #cacfd6);
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--primary-color);
+  margin-top: 1.5rem;
+  box-shadow: 5px 5px 10px #bec3c9, -5px -5px 10px #ffffff;
+  transition: all 0.3s ease;
+}
+
+.swap-button:hover {
+  color: var(--secondary-color);
+  transform: rotate(180deg) scale(1.1);
+  box-shadow: 2px 2px 5px #bec3c9, -2px -2px 5px #ffffff;
+}
+
+.result-info {
+  text-align: center;
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.exchange-rate {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.last-update {
+  color: var(--light-text-color);
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.convert-button, .clear-button {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.convert-button {
+  background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.convert-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 20px rgba(109, 94, 220, 0.4);
+}
+
+.clear-button {
+  background-color: transparent;
+  color: var(--light-text-color);
+  border: 1px solid var(--border-color);
+  box-shadow: none;
+}
+
+.clear-button:hover {
+  background-color: var(--danger-color);
+  color: #fff;
+  border-color: var(--danger-color);
+}
+
+.error-message {
+  background-color: #ffdde0;
+  color: #c0392b;
+  padding: 1rem;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 1rem;
+  border: 1px solid #e74c3c;
+}
+
+.loading-spinner {
+  /* Estilo de loading já está bom, mantendo-o. */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  color: var(--primary-color);
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: var(--primary-color);
+  animation: spin 1s ease infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Ajustes para telas menores */
+@media (max-width: 600px) {
+  .converter-container {
+    padding: 2rem 1.5rem;
+  }
+
+  .currency-selectors {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .swap-button {
+    margin: 0.5rem 0 1.5rem 0;
+    transform: rotate(90deg);
+  }
+
+  .swap-button:hover {
+    transform: rotate(270deg) scale(1.1); /* 180 + 90 */
+  }
+}
