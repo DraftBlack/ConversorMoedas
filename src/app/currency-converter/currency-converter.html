@@ -1,37 +1,75 @@
-<div *ngIf="!isLoading" class="converter-body">
-  <div class="form-group">
-    <label for="amountFrom">Valor</label>
-    <input
-      type="number"
-      id="amountFrom"
-      class="form-control"
-      [(ngModel)]="amountFrom"
-      min="0"
-    />
+<div class="converter-container">
+  <div class="header">
+    <h1>Conversor de Moedas</h1>
+    <p>Cotações em tempo real para suas conversões.</p>
   </div>
 
-  <div class="currency-selectors">
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+  <div *ngIf="isLoading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Carregando cotações...</p>
+  </div>
+
+  <div *ngIf="!isLoading" class="converter-body">
+    <div class="form-group">
+      <label for="amountFrom">Valor</label>
+      <input
+        type="number"
+        id="amountFrom"
+        class="form-control"
+        [(ngModel)]="amountFrom"
+        (keyup.enter)="convert()"
+        min="0"
+      />
     </div>
 
-  <div class="form-group">
-    <label for="amountTo">Valor Convertido</label>
-    <input
-      type="number"
-      id="amountTo"
-      class="form-control"
-      [(ngModel)]="amountTo"
-      min="0"
-    />
-  </div>
+    <div class="currency-selectors">
+      <div class="form-group currency-group">
+        <label for="currencyFrom">De</label>
+        <div class="custom-dropdown">
+          <input type="text" id="currencyFrom" class="form-control dropdown-toggle" [value]="searchTermFrom" (click)="toggleFromDropdown($event)" readonly/>
+          <div class="dropdown-menu" *ngIf="isFromDropdownOpen">
+            <input type="text" class="form-control search-input" placeholder="Buscar moeda..." (input)="filterCurrenciesFrom($event)" (click)="$event.stopPropagation()"/>
+            <ul class="dropdown-list">
+              <li *ngFor="let currency of filteredCurrenciesFrom" (click)="selectCurrencyFrom(currency[0])">
+                {{ currency[0] }} - {{ currency[1] }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
-  <div class="result-info">
-    <p class="exchange-rate">{{ exchangeRate }}</p>
-    <p class="last-update" *ngIf="lastUpdate">
-      Última atualização: {{ lastUpdate | date:'dd/MM/yyyy HH:mm:ss' }} UTC
-    </p>
-  </div>
+      <div class="swap-button-container">
+        <button class="swap-button" (click)="swapCurrencies()" title="Inverter moedas">&#8646;</button>
+      </div>
 
-  <button class="convert-button" (click)="convert()">Converter</button>
-  
-  <button class="clear-button" (click)="clearValues()">Limpar</button>
+      <div class="form-group currency-group">
+        <label for="currencyTo">Para</label>
+        <div class="custom-dropdown">
+          <input type="text" id="currencyTo" class="form-control dropdown-toggle" [value]="searchTermTo" (click)="toggleToDropdown($event)" readonly/>
+          <div class="dropdown-menu" *ngIf="isToDropdownOpen">
+            <input type="text" class="form-control search-input" placeholder="Buscar moeda..." (input)="filterCurrenciesTo($event)" (click)="$event.stopPropagation()"/>
+            <ul class="dropdown-list">
+              <li *ngFor="let currency of filteredCurrenciesTo" (click)="selectCurrencyTo(currency[0])">
+                {{ currency[0] }} - {{ currency[1] }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="amountTo">Valor Convertido</label>
+      <input type="number" id="amountTo" class="form-control" [(ngModel)]="amountTo" min="0"/>
+    </div>
+
+    <div class="result-info">
+      <p class="exchange-rate">{{ exchangeRate }}</p>
+      <p class="last-update" *ngIf="lastUpdate">{{ lastUpdate | date:'dd/MM/yyyy HH:mm:ss' }} UTC</p>
+    </div>
+
+    <button class="convert-button" (click)="convert()">Converter</button>
+    <button class="clear-button" (click)="clearValues()">Limpar</button>
+  </div>
 </div>

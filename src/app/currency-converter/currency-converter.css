@@ -22,7 +22,7 @@
     0 25px 50px -12px rgba(0, 0, 0, 0.25),
     inset 0 0 2px 1px rgba(255, 255, 255, 0.6);
   width: 100%;
-  max-width: 500px;
+  max-width: 700px;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   transition: transform 0.3s ease;
@@ -224,4 +224,83 @@ input[type=number]::-webkit-outer-spin-button {
   .swap-button:hover {
     transform: rotate(270deg) scale(1.1); /* 180 + 90 */
   }
+}
+/* src/app/currency-converter/currency-converter.component.css */
+
+/* ... (todos os estilos anteriores) ... */
+
+/* NOVOS ESTILOS */
+
+.currency-group .form-control {
+    width: 100%; /* Garante que ambos os inputs tenham a mesma largura */
+}
+
+.search-input {
+    margin-bottom: 0.5rem;
+    background-color: #fff; /* Fundo branco para destacar o campo de busca */
+}
+
+.currency-selectors select.form-control {
+    /* Adiciona uma barra de rolagem estilizada se necessário */
+    overflow-y: auto;
+}
+
+.currency-selectors select.form-control option {
+    padding: 0.5rem;
+}
+/* src/app/currency-converter/currency-converter.component.css */
+
+/* ... TODOS OS ESTILOS ANTERIORES ... */
+
+/* NOVOS ESTILOS PARA O DROPDOWN PESQUISÁVEL */
+.currency-group {
+  position: relative; /* Essencial para o posicionamento do dropdown */
+}
+
+.dropdown-toggle {
+  cursor: pointer;
+  background-color: #fff !important;
+  /* Adiciona uma seta para indicar que é clicável */
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1.25rem center; /* Ajustado para dar mais espaço */
+  background-size: 16px 12px;
+  padding-right: 2.5rem; /* <--- NOVO: Mais padding à direita para o texto */
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  margin-top: 0.25rem;
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem;
+}
+
+.dropdown-menu .search-input {
+  margin-bottom: 0.5rem;
+}
+
+.dropdown-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.dropdown-list li {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-list li:hover {
+  background-color: #f1f3f5;
 }

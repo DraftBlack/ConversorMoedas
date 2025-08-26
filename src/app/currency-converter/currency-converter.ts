@@ -1,123 +1,180 @@
 // src/app/currency-converter/currency-converter.component.ts
 
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, HostListener, ElementRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Currency } from '../services/currency'; // Importa nosso serviço
+import { Currency } from '../services/currency';
 
 @Component({
   selector: 'app-currency-converter',
   standalone: true,
-  imports: [CommonModule, FormsModule], // Importa módulos necessários para o template
+  imports: [CommonModule, FormsModule, DatePipe],
   templateUrl: './currency-converter.html',
   styleUrls: ['./currency-converter.css']
 })
-export class CurrencyConverterComponent implements OnInit {
-  // Injeta o serviço de moeda para usá-lo no componente
-  private currency = inject(Currency);
+export class CurrencyConverter implements OnInit {
+  private currencyService = inject(Currency);
+  // Injeta ElementRef para podermos detectar cliques fora do componente
+  private elementRef = inject(ElementRef);
 
-  // Propriedades (variáveis) do nosso componente
   amountFrom = 1;
   amountTo: number | null = null;
-  currencyFrom = 'USD'; // Moeda padrão de origem
-  currencyTo = 'BRL';   // Moeda padrão de destino
-  currencies: [string, string][] = []; // Armazenará a lista de moedas
-  exchangeRate = ''; // Armazenará a taxa de câmbio para exibição
-  lastUpdate = '';   // Armazenará a data da última atualização
-  isLoading = false;   // Controle para o feedback de carregamento
-  errorMessage: string | null = null; // Para mensagens de erro
+  currencyFrom = 'USD';
+  currencyTo = 'BRL';
+  currencies: [string, string][] = [];
 
-  // ngOnInit é um "gancho de ciclo de vida" do Angular.
-  // O código aqui dentro é executado uma vez quando o componente é inicializado.
+  searchTermFrom = 'USD - Dólar Americano'; // NOVO: Inicia com o valor padrão
+  searchTermTo = 'BRL - Real Brasileiro';   // NOVO: Inicia com o valor padrão
+  filteredCurrenciesFrom: [string, string][] = [];
+  filteredCurrenciesTo: [string, string][] = [];
+
+  exchangeRate = '';
+  lastUpdate = '';
+  isLoading = false;
+  errorMessage: string | null = null;
+
+  // NOVO: Propriedades para controlar o estado dos dropdowns
+  isFromDropdownOpen = false;
+  isToDropdownOpen = false;
+
+  // NOVO: Detecta cliques na página inteira
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    // Se o clique foi fora do nosso componente, fecha os dropdowns
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.isFromDropdownOpen = false;
+      this.isToDropdownOpen = false;
+    }
+  }
+
   ngOnInit(): void {
     this.loadCurrencies();
   }
 
-  // Carrega a lista de moedas da API
   loadCurrencies(): void {
-    this.isLoading = true; // Ativa o "loading"
-    this.errorMessage = null; // Limpa erros anteriores
-    this.currency.getSupportedCurrencies().subscribe({
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.currencyService.getSupportedCurrencies().subscribe({
       next: (data) => {
         this.currencies = data.supported_codes;
-        // Após carregar as moedas, busca a cotação inicial
+        this.filteredCurrenciesFrom = [...this.currencies];
+        this.filteredCurrenciesTo = [...this.currencies];
+        // Atualiza os searchTerms iniciais com base nos códigos padrão
+        this.updateSearchTermFrom();
+        this.updateSearchTermTo();
         this.getRate();
-        this.isLoading = false; // Desativa o "loading"
+        this.isLoading = false;
       },
       error: () => {
-        this.errorMessage = 'Não foi possível carregar a lista de moedas. Tente novamente.';
+        this.errorMessage = 'Não foi possível carregar a lista de moedas.';
         this.isLoading = false;
       }
     });
   }
 
-  // Busca a cotação entre as moedas selecionadas
+  // MÉTODOS NOVOS E ATUALIZADOS ABAIXO
+
+  toggleFromDropdown(event: MouseEvent): void {
+    event.stopPropagation(); // Impede que o clique se propague para o document
+    this.isFromDropdownOpen = !this.isFromDropdownOpen;
+    this.isToDropdownOpen = false; // Fecha o outro dropdown
+    this.filteredCurrenciesFrom = [...this.currencies]; // Reseta o filtro ao abrir
+  }
+
+  toggleToDropdown(event: MouseEvent): void {
+    event.stopPropagation();
+    this.isToDropdownOpen = !this.isToDropdownOpen;
+    this.isFromDropdownOpen = false;
+    this.filteredCurrenciesTo = [...this.currencies];
+  }
+
+  selectCurrencyFrom(currencyCode: string): void {
+    this.currencyFrom = currencyCode;
+    this.updateSearchTermFrom();
+    this.isFromDropdownOpen = false;
+    this.getRate();
+  }
+
+  selectCurrencyTo(currencyCode: string): void {
+    this.currencyTo = currencyCode;
+    this.updateSearchTermTo();
+    this.isToDropdownOpen = false;
+    this.getRate();
+  }
+
+  // Funções auxiliares para atualizar o texto do campo de busca/display
+  private updateSearchTermFrom(): void {
+    const found = this.currencies.find(c => c[0] === this.currencyFrom);
+    if (found) {
+      this.searchTermFrom = `${found[0]} - ${found[1]}`;
+    }
+  }
+
+  private updateSearchTermTo(): void {
+    const found = this.currencies.find(c => c[0] === this.currencyTo);
+    if (found) {
+      this.searchTermTo = `${found[0]} - ${found[1]}`;
+    }
+  }
+
+  filterCurrenciesFrom(event: Event): void {
+    const term = (event.target as HTMLInputElement).value.toLowerCase();
+    this.filteredCurrenciesFrom = this.currencies.filter(
+      (currency) =>
+        currency[0].toLowerCase().includes(term) ||
+        currency[1].toLowerCase().includes(term)
+    );
+  }
+
+  filterCurrenciesTo(event: Event): void {
+    const term = (event.target as HTMLInputElement).value.toLowerCase();
+    this.filteredCurrenciesTo = this.currencies.filter(
+      (currency) =>
+        currency[0].toLowerCase().includes(term) ||
+        currency[1].toLowerCase().includes(term)
+    );
+  }
+
   getRate(): void {
+    // (O conteúdo deste método e dos outros abaixo permanece o mesmo)
+    // ... getRate, convert, swapCurrencies, clearValues ...
     this.isLoading = true;
     this.errorMessage = null;
-    this.currency.getExchangeRate(this.currencyFrom, this.currencyTo).subscribe({
+    this.currencyService.getExchangeRate(this.currencyFrom, this.currencyTo).subscribe({
       next: (data) => {
         const rate = data.conversion_rate;
-        this.amountTo = this.amountFrom * rate; // Calcula a conversão inicial
-        this.exchangeRate = `1 ${this.currencyFrom} = ${rate} ${this.currencyTo}`;
+        this.amountTo = this.amountFrom * rate;
+        this.exchangeRate = `1 ${this.currencyFrom} = ${rate.toFixed(4)} ${this.currencyTo}`;
         this.lastUpdate = data.time_last_update_utc;
         this.isLoading = false;
       },
       error: () => {
-        this.errorMessage = 'Não foi possível obter a cotação. Verifique as moedas selecionadas.';
+        this.errorMessage = 'Não foi possível obter a cotação.';
         this.isLoading = false;
       }
     });
   }
 
-  // Converte o valor de 'origem' para 'destino'
   convert(): void {
     if (this.amountFrom > 0) {
-      this.getRate(); // Sempre busca a taxa mais recente ao converter
+      this.getRate();
     } else {
         this.amountTo = null;
     }
   }
 
-  // Converte o valor de 'destino' para 'origem' (RF04.3)
-  convertReverse(): void {
-    if (this.amountTo && this.amountTo > 0) {
-        this.isLoading = true;
-        this.errorMessage = null;
-        // Para a conversão reversa, precisamos da taxa inversa (ex: BRL para USD)
-        this.currency.getExchangeRate(this.currencyTo, this.currencyFrom).subscribe({
-            next: (data) => {
-                const rate = data.conversion_rate;
-                this.amountFrom = this.amountTo! * rate;
-                this.exchangeRate = `1 ${this.currencyFrom} = ${1 / rate} ${this.currencyTo}`;
-                this.lastUpdate = data.time_last_update_utc;
-                this.isLoading = false;
-            },
-            error: () => {
-                this.errorMessage = 'Não foi possível realizar a conversão reversa.';
-                this.isLoading = false;
-            }
-        });
-    } else {
-        this.amountFrom = 1;
-    }
-  }
-
-  // Inverte as moedas selecionadas (RF04.1)
   swapCurrencies(): void {
-    // Usa uma variável temporária para a troca
-    const temp = this.currencyFrom;
+    const tempCode = this.currencyFrom;
     this.currencyFrom = this.currencyTo;
-    this.currencyTo = temp;
-
-    // Após a troca, recalcula a conversão
+    this.currencyTo = tempCode;
+    this.updateSearchTermFrom();
+    this.updateSearchTermTo();
     this.getRate();
   }
 
-  // Limpa os valores dos campos (RF02.4)
   clearValues(): void {
     this.amountFrom = 1;
     this.amountTo = null;
-    this.getRate(); // Recalcula com o valor padrão
+    this.getRate();
   }
 }
